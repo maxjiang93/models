@@ -1,0 +1,23 @@
+#!/bin/bash
+#SBATCH -A TG-CCR140008
+#SBATCH -J minieval           # job name
+#SBATCH -o minieval.o%j       # output and error file name (%j expands to jobID)
+#SBATCH -n 1
+#SBATCH -p gpu     # queue (partition) -- normal, development, etc.
+#SBATCH -t 00:10:00        # run time (hh:mm:ss) - 10 mins
+
+module reset
+module load gcc/4.9.1 cuda/8.0 cudnn/5.1 python/2.7.12 tensorflow-gpu/1.0.0
+
+DATASET_DIR=$WORK/data
+TRAIN_DIR=$WORK/trainlog
+
+CHECKPOINT_FILE=${TRAIN_DIR}/model.ckpt-53297  # Example
+python eval_image_classifier.py \
+  --alsologtostderr \
+  --checkpoint_path=${CHECKPOINT_FILE} \
+  --dataset_dir=${DATASET_DIR} \
+  --dataset_name=miniplaces \
+  --dataset_split_name=train \
+  --model_name=inception_v3 \
+  --eval_image_size=128

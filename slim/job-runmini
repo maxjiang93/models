@@ -1,0 +1,27 @@
+#!/bin/bash
+#SBATCH -A TG-CCR140008
+#SBATCH -J inception           # job name
+#SBATCH -o inception.o%j       # output and error file name (%j expands to jobID)
+#SBATCH -n 1
+#SBATCH -p gpu     # queue (partition) -- normal, development, etc.
+#SBATCH -t 12:00:00        # run time (hh:mm:ss) - 6 hours
+#SBATCH --mail-user=maxjiang93@gmail.com
+#SBATCH --mail-type=begin  # email me when the job starts
+#SBATCH --mail-type=end    # email me when the job finishes
+
+module reset
+module load gcc/4.9.1 cuda/8.0 cudnn/5.1 python/2.7.12 tensorflow-gpu/1.0.0
+
+DATASET_DIR=$WORK/data
+TRAIN_DIR=$WORK/trainlog
+python train_image_classifier.py \
+  --train_dir=${TRAIN_DIR} \
+  --dataset_name=miniplaces \
+  --dataset_split_name=train \
+  --dataset_dir=${DATASET_DIR} \
+  --model_name=inception_v3 \
+  --max_number_of_steps=100000 \
+  --train_image_size=128 \
+  --num_clones=1 \
+  --save_interval_secs=1200 \
+  --batch_size=256 \
